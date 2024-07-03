@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.exam.model.Model;
+import it.polito.tdp.exam.model.Team;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -35,10 +36,10 @@ public class FXMLController {
     private Button btnSimula; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbAnno"
-    private ComboBox<?> cmbAnno; // Value injected by FXMLLoader
+    private ComboBox<Integer> cmbAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbSquadra"
-    private ComboBox<?> cmbSquadra; // Value injected by FXMLLoader
+    private ComboBox<Team> cmbSquadra; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -48,7 +49,11 @@ public class FXMLController {
 
     @FXML
     void handleCreaGrafo(ActionEvent event) {
-
+    	if (cmbSquadra.getValue() != null) {
+    		Team t = cmbSquadra.getValue();
+    		model.creaGrafo(t);
+    		txtResult.appendText("Vertici: "+ model.getV()+ "\nArchi: "+ model.getA());
+    	}
     }
 
     @FXML
@@ -75,6 +80,7 @@ public class FXMLController {
 
     public void setModel(Model model) {
         this.model = model;
+        cmbSquadra.getItems().addAll(model.getTeams());
     }
 
 }

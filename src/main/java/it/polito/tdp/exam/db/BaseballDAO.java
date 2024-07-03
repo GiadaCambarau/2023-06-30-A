@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import it.polito.tdp.exam.model.People;
 import it.polito.tdp.exam.model.Team;
@@ -67,6 +68,86 @@ public class BaseballDAO {
 			throw new RuntimeException("Error Connection Database");
 		}
 	}
+	
+	public List<Team> getTeam(Map<String, Team> mappa) {
+		String sql = "SELECT DISTINCT  t.name as n "
+				+ "FROM appearances a, teams t  "
+				+ "WHERE a.teamID = t.ID "
+				+ "ORDER BY t.name asc";
+		List<Team> result = new ArrayList<>();
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				Team t = mappa.get(rs.getString("n"));
+				result.add(t);
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
+	public List<Integer> getAnni(Team t){
+		String sql = "SELECT DISTINCT  a.`year` as y "
+				+ "FROM appearances a, teams t  "
+				+ "WHERE t.name = ? AND a.teamCode = t.teamCode";
+		List<Integer> result = new ArrayList<>();
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, t.getName());
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				result.add(rs.getInt("y"));
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
+	public List<People> getGiocatori(Team t, int anno, Map<String, People> mappa){
+		String sql = "SELECT a.playerID as id "
+				+ "FROM appearances a, teams t  "
+				+ "WHERE t.name = ? AND a.teamID = t.ID AND a.`year`= ? ";
+		List<People> result = new ArrayList<>();
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, t.getName());
+			st.setInt(2, anno);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				result.add(mappa.get(rs.getString("id")));
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+				
+	}
+	
+	
 
 	// =================================================================
 	// ==================== HELPER FUNCTIONS =========================
